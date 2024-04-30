@@ -9,13 +9,15 @@ from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from llama_index.llms.groq import Groq
 
 app = FastAPI()
 
 
 load_dotenv()
 
-Settings.llm = OpenAI(model='gpt-4-turbo-preview', api_key= os.environ['OPENAI_API_KEY'])
+# Settings.llm = OpenAI(model='gpt-4-turbo-preview', api_key= os.environ['OPENAI_API_KEY'])
+Settings.llm = Groq(model="llama3-70b-8192")
 Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large", api_key=os.environ['OPENAI_API_KEY'])
 
 def description_json_to_str(description):
