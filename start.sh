@@ -1,1 +1,1 @@
-nohup uvicorn fastapi_app:app --log-level debug --reload --port 8002  > nohup_server.out 2>&1 &
+nohup uvicorn app:app --log-level debug --reload --port 8002  > nohup_server.out 2>&1 &
