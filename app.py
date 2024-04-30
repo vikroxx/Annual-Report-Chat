@@ -14,10 +14,13 @@ from llama_index.llms.groq import Groq
 app = FastAPI()
 
 
-load_dotenv()
+# load_dotenv()
+
+print("Groq_api_key : ",os.environ['GROQ_API_KEY'][0:5])
+print("Openai_api_key : " ,os.environ['OPENAI_API_KEY'][0:5])
 
 # Settings.llm = OpenAI(model='gpt-4-turbo-preview', api_key= os.environ['OPENAI_API_KEY'])
-Settings.llm = Groq(model="llama3-70b-8192")
+Settings.llm = Groq(model="llama3-70b-8192", api_key=os.environ['GROQ_API_KEY'])
 Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large", api_key=os.environ['OPENAI_API_KEY'])
 
 def description_json_to_str(description):
@@ -77,20 +80,33 @@ def get_images_from_source_nodes(source_nodes):
     images = []
     for node in source_nodes:
         if "image_path" in node.metadata.keys():
-            images.append(node.metadata["image_path"])
-    return images
+            if node.metadata["image_path"].split(".")[-1] =="json":
+                images.append(".".join(node.metadata["image_path"].split(".")[:-1])+ ".png")
+            else:
+                images.append(node.metadata["image_path"])
+    return list(set(images))
 
+def get_page_numbers_from_source_nodes(source_nodes):
+    page_numbers = []
+    for node in source_nodes:
+        if "page_number" in node.metadata.keys():
+            page_numbers.append(str(node.metadata["page_number"]))
+    return page_numbers
 
 engine = init_index()
 
 @app.get("/query")
 def query_engine(query:str):
-    query += "Answer in detail from the context provided. If there are any relevant urls in the context, please provide them as well."
+    query += "Answer in detail from the context provided. Be extremely detailed and decriptive about your answer."
     try:
         response = engine.query(query)
         images = get_images_from_source_nodes(response.source_nodes)
+        page_numbers = get_page_numbers_from_source_nodes(response.source_nodes)
+        page_number_string = ""
+        if len(page_numbers) > 0:
+            page_number_string = "\n\nREFERNCE PAGE NUMBERS: {}".format(", ".join(list(set(page_numbers))))
+        
     except ValueError:
         response = "The given question cannot be answered using the provided context."
         images = []
-
-    return {"response":str(response),'images':images}
+    return {"response":str(response) + "\n" + page_number_string,'images':images}
