@@ -105,8 +105,9 @@ def query_engine(query:str):
         page_number_string = ""
         if len(page_numbers) > 0:
             page_number_string = "\n\nREFERNCE PAGE NUMBERS: {}".format(", ".join(list(set(page_numbers))))
-        
+        return {"response":str(response) + "\n" + page_number_string,'images':images}
+
     except ValueError:
         response = "The given question cannot be answered using the provided context."
         images = []
-    return {"response":str(response) + "\n" + page_number_string,'images':images}
+        return {"response":str(response) ,'images':images}
