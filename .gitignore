@@ -1,3 +1,4 @@
 .env
 __pycache__/
 ey_23.pdf
+nohup_server.out
