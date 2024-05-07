@@ -20,6 +20,9 @@ print("Groq_api_key : ",os.environ['GROQ_API_KEY'][0:5])
 print("Openai_api_key : " ,os.environ['OPENAI_API_KEY'][0:5])
 
 # Settings.llm = OpenAI(model='gpt-4-turbo-preview', api_key= os.environ['OPENAI_API_KEY'])
+groq_model  = Groq(model="llama3-70b-8192", api_key=os.environ['GROQ_API_KEY'])
+chatgpt_model = OpenAI(model='gpt-4-turbo-preview', api_key= os.environ['OPENAI_API_KEY'])
+
 Settings.llm = Groq(model="llama3-70b-8192", api_key=os.environ['GROQ_API_KEY'])
 Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large", api_key=os.environ['OPENAI_API_KEY'])
 
@@ -70,7 +73,7 @@ def init_index():
             )
     
     query_engine = RouterQueryEngine(
-    selector=LLMMultiSelector.from_defaults(llm=OpenAI(model='gpt-4-turbo-preview'),max_outputs=2),
+    selector=LLMMultiSelector.from_defaults(llm=groq_model,max_outputs=2),
     query_engine_tools=[tool_dict[key] for key in tool_dict.keys()],
     verbose=True
     )
